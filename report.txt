@@ -1,0 +1,164 @@
+1. Enter the number of hours it took you to complete the project between
+   the <<< and >>> signs below (eg, <<<10>>>).
+
+   <<< 7 >>>
+   
+2. Enter the difficulty level (1: very easy; 5: very difficult) of the project
+   between the <<< and >>> signs below (eg, <<<3>>>).
+
+   <<< 3 >>>
+
+3. Provide a short description of how you approached each problem, issues you 
+   encountered, and how you resolved those issues.
+
+   Problem 1 (WordNet Data Type)
+      Approach:  1) Instance variables - st (A ST that maps synsets noun to a set of synsets ids),
+      rst(A ST that maps synsets ids to the corresponding synsets strings) and sca(for the computation
+      of the shortest ancestor and the shortest ancestral path).
+
+      2) WordNet() - In the constructor, I am checking that if the given synsets file is null or not.
+      If it is null, them I am throwing a NPE with a message saying that the synsets is null.
+      Then I am checking if the given hypernyms file is null or not. If it is null, then I throw a
+      NPE with a message saying that the hypernyms is null. Then I am initialising the instance variables rst and st.
+      Further, in order to build the ST with the synsets ids and synsets string. I create two Instream
+      objcet - in1 and in2 from the synsets and hypernyms file respectively.
+      From in1 object, I read all the lines of the synsets file at once and store it in the array lines.
+      I do a for loop then to iterate over the line in lines, I split it using the comma(,) as the delimiter and
+      store it another into another array a (As the format specified for the synset file, the first field in the line is the
+      synsets is, and then it is the synsets string, and then the gloss). For each line, I add the synsets id
+      and the synsets string as a new key-value pair in the ST rst.
+      To build st, I again split the array a by a space ("") as the delimiter in order to separate synsets string
+      into synsets noun and store it into another array b. As the ST 'st' maps synsets nouns to a ser of synsets ids,
+      I do a for loop. For each noun in the array b, If the noun already exits, then I add the corresponding
+      synsets id to the set. Otherwise, I first create a new set and then add the corresponding synsets id.
+      To initialise sca, I had to create a digraph object as the sca constructor takes digraph as an argument.
+      So, I create a digraph object G. Then, from the in2 object, I read all the lined of the hypernyms
+      file all at once and store the lines in the array lines2. As the format of the file is specified,
+      the first field is the synset id and the corresponding fields tells that there is a directed edge
+      from the first field to the corresponding next fields. So, I usded a comma as thed elimiter and split the line
+      into tokens and stored it into the array a. For all the elements in the array from the index 1,
+      I add an edge in the graph directed from the first element(a[0]) to every pther corresponding
+      next elements. Once the graph G is realy, I initialised the sca by passing G as an argument.
+      Hence, the following instance variables st, rst and sca are initialised properly into the constructor
+      from the two given files synsets and hypernyms respectively.
+
+      3) nouns() - As st maps nouns to a set of the synsets ids. I simply returned the keys of the st
+      in order to return all the nouns.
+
+      4) isnoun() - In this method I am checking if the given noun is null or not. If it is null, then I
+      throw a NPE with a message saying that the given noun is null. Otherwise, I check if the given
+      noun exits in st or not. If ot does then I return true else I return false.
+
+      5) sca() - I checked if the noun1 and noun2 are null or not. If they are null, then I throw a NPE
+      with a message saying that "noun1 is null" or "noun2 is null".
+      I also check if the given noun1 and noun2 are nouns or not(If the noun exits in st it is noun).
+      If not, then I throw IAE with a message saying that the noun1 is not a noun or noun2 is not a noun.
+      In order to return the shortest common ancestor of the noun1 and noun2, I call the
+       ancestor method. However, as the ancestor method taken two vertex and not the nouns.
+      Therefore, I fetched their corresponding vertex by calling st.get() method(as st maps
+      nouns to a set of string IDS). This method returned me a set of the synsetd ids(vertices). Thus, now
+      I call the ancestor method on the two subset of vertex for noun1 and noun2. It returned me a
+      synset id of the sca. So, I again fetched the corresponding synset noun by calling rst.get()
+      method(as rst maps synsets ids to synsets strings).
+
+      6) distance() - In order to return the length of the shortest ancestral path between noun1 and noun2.
+      I first check if noun1 and noun2 are null or not. If they are null, then I throw a NPE with
+      a message saying that noun1 or noun2 is null.
+      Then, I check if noun1 and noun2 are noun or not (If it does not exist in st it is not a noun).
+      If it is not, then I throw a NPe with a message saying that the noun1 or noun2 is not a noun.
+      In order to find the shotest length, I call the length method on sca. However, as it takes
+      synsets ids and not synsets nouns, I fetched the nouns' corresponding ids using the st.get()method.
+      As it returns a set of string ids, I pass this as the argument to the overloaded length method.
+      It correctly returns the shortest ancestral length of the given two nouns.
+
+
+      Issues and resolution: I was confused about how to add all the integer ids in a
+      set for a particular noun in the constructor for the st instance variable.
+      Prof Swami helped me out in implementing it.
+
+   Problem 2 (ShortestCommonAncestor Data Type)
+      Approach:
+      1) Instance variables - A rooted DAG, DiGraph G.
+
+      2) ShortestCommonAncestor() - In the constructor, I intialised the instance variable this.G to the
+      given graph G.
+
+      3) distFrom() - The private method returns a ST that maps all the vertices that reachable
+      from the given source vertex and their corresponding shortest distance. To implement this method,
+      I used the BFS algorithm. I Created a queue q and a ST 'st'. I enqueued the given vertex into q.
+      Also, added the source vertex with a value of 0 into the ST (meaning that the distance from the given
+      vertex to itself is 0). As long as the queue q is not empty, I dequeue a vertex from it and iterate
+      though all the neighbouring vertex using the adj(s) method define in the diGraph datatype.  Then, if the
+      neighbouring vertex is not already in the ST, I add it with a value of st.get(neighbouring vertex) + 1.
+      Since, due to this algorithm, we travel the vertex in a way that corresponding next neighbouring vertex
+      is one hop away from the dequeued vertex. Thus, this way I map all the reachable vertices from the
+      given vertex and their corresponding shortest distance.
+
+      4) length() - In order to return the shortest ancestral path from the given two vertex, I first checked
+      that if the given vertex v and w are in the required range. That between 0 to G.V()
+      (total vertices n the graph) Further, I called the ancestor() method in order to fetch the vertex
+      the shortest common ancestor. Then, I make two calls to the distFrom() method from the v
+      and w respectively. At the end, I simply returned the sum of the distance from the vertex v from
+      a(the shortest common ancestor) and distance from w to a(sca).It is the shortest ancestral path.
+
+      5) ancestor() method - I first checked that if the given vertex v and w are in the required
+      range. That between 0 to G.V()(total vertices n the graph). If not then I throw an IAE with a
+      message saying that v is null or w is null.
+      Then I set a variable distance to infinity to keep tract of the shortest distance and another
+      variable ances to keep track of the shortest ancestor. Further, I make two calls to distFrom()
+      method from v and w. It returns a ST that maps all the vertices that are reachable from v and w and their
+      corresponding distances. Thus, I iterate through all of them one by one and compute the distance
+      by calling the get() method on the ST. if the computed distance is less than the distance, then
+      I update distance and also save the ancestor in the variable ances and simply return it at the end.
+
+      6)triad() - I set a variable distance to infinity. Then, I do a nested for loop
+      to iterate through the vertexes in subset A and subset B. I call the ancestor() method to
+      get the shortest common ancestor and also call the length method to find the shortest ancestral path
+      length. If the length computed is smaller than the distance, then I update the value of the distance.
+      I also update the values of each element in the array accordingly as triad returned the array
+      with first element to be sca, second elemet to be the vertex from subset A and third element
+      to be the vertex from subset B. At the end I return the array which I called table in my method.
+
+      7) length() - I first checked that id the subsets A and B is null or not. If they are, then I return a NPE.
+      Further, I checked if the subsets are empty or not, If they are then I return IAE.
+      Otherwise, I make a call to triad() which return a table with first element to be the sca which
+      I call it n, the other element to be the vertex from A which I call it v, and third element to be the vertex
+      from the subset B which I call be w. Then, I make two calls to distFrom from v and w and simply
+      return the sum of the distance from v and w to the sca(n).
+
+      8) Ancestor() - I first checked that id the subsets A and B is null or not. If they are, then I return a NPE.
+        Further, I checked if the subsets are empty or not, If they are then I return IAE. I make a call to
+        the triad which returns an array whose first element is the common ancestor, and I simply return that.
+
+
+      Issues and resolution: In the triad() method I was doing the comparison in the if
+      condition as (distance < l) instead of (distance > l).
+      Also, in the distFrom() method, I was not enqueuing n (neighbour) into the queue q.
+      Both the issues were pointed out by prof Swami.
+
+   Problem 3 (Outcast Data Type)
+      Approach: I first set a variable outC to an empty string "" and another variable maxDistance to 0.
+      maxDistance keeps track of the max distance found so far and outC keeps track of the noun which is
+      at a mac distance(outcast).
+      In order to find the outcast, I did a nest loop. Each iterating through the nouns.
+      As the tempDistance will keep on changing as it noun changes, therefore I initialised the tempDistance to 0
+      just after the first for-loop. Then in the nested for loop, I compute the shortest ancestral
+       distance between the ith noun and the jth noun. If the computed tempDistance is greter than current maxDistance,
+       then I update the maxDistance. Also, remember the ith noun and return it at the end.
+       I continue this for every ith noun. Hence, this way I am able to figure out the outcast.
+
+      Issues and resolution: I had no issues with this problem.
+
+4. Did you receive help from anyone? List their names, status (classmate, 
+   CS210 grad, TA, other), and the nature of help received.
+
+   Name               Status       Help Received
+   Swami Iyer        Professor    Problem 1 and Problem 2
+
+   ...                ...          ...
+
+5. List any other comments here. Feel free to provide any feedback on how
+   much you learned from doing the assignment, and whether you enjoyed
+   doing it.
+
+   An interesting project.
